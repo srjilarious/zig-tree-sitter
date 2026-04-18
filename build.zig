@@ -97,31 +97,31 @@ pub fn build(b: *std.Build) !void {
     }
 
     // HACK: fetch tree-sitter-c only for tests (ziglang/zig#19914)
-    if (b.pkg_hash.len > 0) return;
-    var args = try std.process.argsWithAllocator(b.allocator);
-    defer args.deinit();
-    while (args.next()) |a| {
-        if (std.mem.eql(u8, a, "test")) {
-            const dep = b.lazyDependency("tree-sitter-c", .{
-                .target = target,
-                .optimize = optimize,
-            }) orelse continue;
-            const depmod = dep.module("tree-sitter-c");
-            depmod.addImport("tree-sitter", module);
-            test_mod.addImport("tree-sitter-c", depmod);
+    // if (b.pkg_hash.len > 0) return;
+    // var args = try std.process.argsWithAllocator(b.allocator);
+    // defer args.deinit();
+    // while (args.next()) |a| {
+    //     if (std.mem.eql(u8, a, "test")) {
+    //         const dep = b.lazyDependency("tree-sitter-c", .{
+    //             .target = target,
+    //             .optimize = optimize,
+    //         }) orelse continue;
+    //         const depmod = dep.module("tree-sitter-c");
+    //         depmod.addImport("tree-sitter", module);
+    //         test_mod.addImport("tree-sitter-c", depmod);
 
-            if (enable_wasm) {
-                const run_curl = b.addSystemCommand(&.{ "curl", "-LSsf", wasm_url, "-o" });
-                const wasm_file = run_curl.addOutputFileArg("tree-sitter-c.wasm");
-                run_curl.expectExitCode(0);
-                run_curl.expectStdErrEqual("");
-                test_step.dependOn(&run_curl.step);
-                test_mod.addAnonymousImport("tree-sitter-c.wasm", .{
-                    .root_source_file = wasm_file,
-                });
-            }
+    //         if (enable_wasm) {
+    //             const run_curl = b.addSystemCommand(&.{ "curl", "-LSsf", wasm_url, "-o" });
+    //             const wasm_file = run_curl.addOutputFileArg("tree-sitter-c.wasm");
+    //             run_curl.expectExitCode(0);
+    //             run_curl.expectStdErrEqual("");
+    //             test_step.dependOn(&run_curl.step);
+    //             test_mod.addAnonymousImport("tree-sitter-c.wasm", .{
+    //                 .root_source_file = wasm_file,
+    //             });
+    //         }
 
-            break;
-        }
-    }
+    //         break;
+    //     }
+    // }
 }
